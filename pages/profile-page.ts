@@ -1,10 +1,12 @@
-import { expect, Page } from '@playwright/test';
+import { Page } from '@playwright/test';
 import { ProfileLocators } from '../locators/profile-locators';
 import { CommonPage } from './common-page';
-import { AddressData, UpdateProfileData, UserProfile } from '../models/user';
+import { UserProfile } from '../models/user';
+import { Address } from '../models/address';
 import { step } from '../utilities/logging';
 import { Messages } from '../data/messages.data';
-import { Constants } from '../utilities/constants';
+import { AssertHelper } from '../utilities/assert-helper';
+import { Assertions } from '../utilities/assertions';
 
 /**
  * Page object for user profile actions in My Account area.
@@ -20,30 +22,53 @@ export class ProfilePage extends ProfileLocators {
   /**
    * Verifies My Account page URL and heading.
    */
+  @step('Verify My Account page is displayed')
   async verifyMyAccountPage(): Promise<void> {
-    await expect(this.page).toHaveURL(Constants.MY_ACCOUNT_URL);
-    await expect(this.accountHeading).toBeVisible();
+    await AssertHelper.expectUrl(this.page, /route=account\/account/, 'My Account');
+    await AssertHelper.expectVisible(this.accountHeading, 'My Account heading');
   }
-
+  async verifyRightColumn(): Promise<void> {
+    await AssertHelper.expectVisible(this.accountRightColumn, 'right column');
+  }
   /**
    * Updates the user's profile information with the provided data.
-   */
+   * @param profileData - An object containing the user's profile information to be updated.
+  */
+ @step('Update profile information')
   async updateProfileInformation(profileData: UserProfile): Promise<void> {
-    await this.inputFirstName.fill(profileData.firstName);
-    await this.inputLastName.fill(profileData.lastName);
-    await this.inputUpdateEmail.fill(profileData.email);
-    await this.inputTelephone.fill(profileData.phone);
-    await this.btnUpdateAccount.click();
+  await this.commonPage.fill(this.inputFirstName, profileData.firstName);
+  await this.commonPage.fill(this.inputLastName, profileData.lastName);
+  await this.commonPage.fill(this.inputUpdateEmail, profileData.email);
+  await this.commonPage.fill(this.inputTelephone, profileData.phone);
+  await this.commonPage.click(this.btnUpdateAccount);
   }
 
   /**
    * Verifies that the user's profile information matches the expected data.
+   * @param expectedProfileData - An object containing the expected profile information to be verified against the actual values on the page.
    */
+  @step('Verify profile information')
   async verifyProfileInformation(expectedProfileData: UserProfile): Promise<void> {
-    await expect(this.inputFirstName).toHaveValue(expectedProfileData.firstName);
-    await expect(this.inputLastName).toHaveValue(expectedProfileData.lastName);
-    await expect(this.inputUpdateEmail).toHaveValue(expectedProfileData.email);
-    await expect(this.inputTelephone).toHaveValue(expectedProfileData.phone);
+    await AssertHelper.expectInputValue(
+      this.inputFirstName,
+      expectedProfileData.firstName,
+      'firstName',
+    );
+    await AssertHelper.expectInputValue(
+      this.inputLastName,
+      expectedProfileData.lastName,
+      'lastName',
+    );
+    await AssertHelper.expectInputValue(
+      this.inputUpdateEmail,
+      expectedProfileData.email,
+      'email',
+    );
+    await AssertHelper.expectInputValue(
+      this.inputTelephone,
+      expectedProfileData.phone,
+      'phone',
+    );
   }
 
   /**
@@ -58,74 +83,99 @@ export class ProfilePage extends ProfileLocators {
    * Opens Edit Account page.
    */
   async openEditAccountPage(): Promise<void> {
-    await this.btnEditAccount.click();
+    await this.commonPage.click(this.btnEditAccount);
   }
 
   /**
-   * Updates first name, last name and telephone.
+   * Updates first name, last name and phone.
+   * @param data - An object containing first name, last name and phone to be updated.
    */
-  async updateAccountInformation(data: UpdateProfileData): Promise<void> {
-    await this.inputFirstName.fill(data.firstName);
-    await this.inputLastName.fill(data.lastName);
-    await this.inputTelephone.fill(data.telephone);
-    await this.btnUpdateAccount.click();
+  @step('Update account information')
+  async updateAccountInformation(data: UserProfile): Promise<void> {
+    await this.commonPage.fill(this.inputFirstName, data.firstName);
+    await this.commonPage.fill(this.inputLastName, data.lastName);
+    await this.commonPage.fill(this.inputTelephone, data.phone);
+    await this.commonPage.click(this.btnUpdateAccount);
   }
 
   /**
    * Verifies account update success message.
+   * @param expectedMessage - The expected success message to be verified.
    */
+  @step('Verify account update success message')
   async expectAccountUpdateSuccessMessage(): Promise<void> {
-    await expect(this.alertSuccessUpdate).toBeVisible();
-    await expect(this.alertSuccessUpdate).toContainText(
+    await AssertHelper.expectVisible(this.alertSuccessUpdate, 'account update success alert');
+    await AssertHelper.expectContainsText(
+      this.alertSuccessUpdate,
       Messages.ACCOUNT_UPDATE_SUCCESS_MESSAGE,
+      'account update success alert',
     );
   }
 
   /**
    * Reads values from Edit Account form for data persistence validation.
    */
-  async getEditAccountValues(): Promise<UpdateProfileData> {
+  @step('Get values from Edit Account form')
+  async getEditAccountValues(): Promise<Pick<UserProfile, 'firstName' | 'lastName' | 'phone'>> {
     return {
       firstName: await this.inputFirstName.inputValue(),
       lastName: await this.inputLastName.inputValue(),
-      telephone: await this.inputTelephone.inputValue(),
+      phone: await this.inputTelephone.inputValue(),
     };
   }
 
   /**
    * Verifies Edit Account form values against expected data.
    */
-  async expectEditAccountValues(expectedData: UpdateProfileData): Promise<void> {
+  @step('Verify Edit Account form values')
+  async expectEditAccountValues(expectedData: UserProfile): Promise<void> {
     const actualData = await this.getEditAccountValues();
 
-    expect(actualData.firstName).toBe(expectedData.firstName);
-    expect(actualData.lastName).toBe(expectedData.lastName);
-    expect(actualData.telephone).toBe(expectedData.telephone);
+    Assertions.assertEqual(
+      actualData.firstName,
+      expectedData.firstName,
+      'First name is not persisted correctly',
+    );
+    Assertions.assertEqual(
+      actualData.lastName,
+      expectedData.lastName,
+      'Last name is not persisted correctly',
+    );
+    Assertions.assertEqual(
+      actualData.phone,
+      expectedData.phone,
+      'Phone is not persisted correctly',
+    );
   }
 
   /**
    * Opens Change Password page from side menu.
    */
+  @step('Open Change Password page')
   async openChangePasswordPage(): Promise<void> {
-    await this.btnUpdatePassword.click();
+    await this.commonPage.click(this.btnUpdatePassword);
   }
 
   /**
    * Changes account password.
    */
+  @step('Change account password')
   async changePassword(newPassword: string): Promise<void> {
-    await this.inputNewPassword.fill(newPassword);
-    await this.inputNewPasswordConfirm.fill(newPassword);
-    await this.btnChangePasswordContinue.click();
+    await this.commonPage.fill(this.inputNewPassword, newPassword);
+    await this.commonPage.fill(this.inputNewPasswordConfirm, newPassword);
+    await this.commonPage.click(this.btnChangePasswordContinue);
   }
 
   /**
    * Verifies change password success message.
    */
+  @step('Verify change password success message')
   async expectChangePasswordSuccessMessage(): Promise<void> {
-    await expect(this.alertSuccessUpdate).toBeVisible();
-    await expect(this.alertSuccessUpdate).toContainText(
+    await AssertHelper.expectVisible(this.alertSuccessUpdate, 'change password success alert');
+    await AssertHelper.expectContainsText(
+      this.alertSuccessUpdate,
       Messages.CHANGE_PASSWORD_SUCCESS_MESSAGE,
+      'change password success alert',
     );
   }
 
@@ -134,8 +184,8 @@ export class ProfilePage extends ProfileLocators {
    */
   @step('Open Add Address form')
   async openAddAddressPage(): Promise<void> {
-    await this.btnModifyAddress.click();
-    await this.btnNewAddress.click();
+    await this.commonPage.click(this.btnModifyAddress);
+    await this.commonPage.click(this.btnNewAddress);
   }
 
   /**
@@ -145,31 +195,38 @@ export class ProfilePage extends ProfileLocators {
    * This page object only uses the provided data and does not generate random data.
    */
   @step('Add new address to Address Book')
-  async addNewAddress(data: AddressData): Promise<void> {
-    await this.inputAddressFirstName.fill(data.firstName);
-    await this.inputAddressLastName.fill(data.lastName);
-    await this.inputAddressCompany.fill(data.company);
-    await this.inputAddressLine1.fill(data.address1);
-    await this.inputAddressLine2.fill(data.address2);
-    await this.inputAddressCity.fill(data.city);
-    await this.inputAddressPostcode.fill(data.postcode);
+  async addNewAddress(data: Address): Promise<void> {
+    await this.commonPage.fill(this.inputAddressFirstName, data.firstName);
+    await this.commonPage.fill(this.inputAddressLastName, data.lastName);
+    await this.commonPage.fill(this.inputAddressCompany, data.company);
+    await this.commonPage.fill(this.inputAddressLine1, data.address1);
+    await this.commonPage.fill(this.inputAddressLine2, data.address2);
+    await this.commonPage.fill(this.inputAddressCity, data.city);
+    await this.commonPage.fill(this.inputAddressPostcode, data.postCode);
 
     await this.selectCountryAndRegion(data.country, data.region);
 
     await this.getDefaultAddressRadio(data.defaultAddress).check();
-    await this.btnAddAddressContinue.click();
+    await this.commonPage.click(this.btnAddAddressContinue);
   }
 
   /**
    * Selects country first, waits for the expected region option, then selects region.
    */
+  @step('Select country and region in Address form')
   async selectCountryAndRegion(country: string, region: string): Promise<void> {
-    await expect(this.countryDropdown(country)).toBeAttached();
+    await AssertHelper.expectAttached(
+      this.countryOptionByName(country),
+      `country option ${country}`,
+    );
 
     await this.selectAddressCountry.selectOption({ label: country });
     await this.selectAddressRegion.waitFor({ state: 'visible' });
 
-    await expect(this.regionDropdown(region)).toBeAttached();
+    await AssertHelper.expectAttached(
+      this.regionOptionByName(region),
+      `region option ${region}`,
+    );
 
     await this.selectAddressRegion.selectOption({ label: region });
   }
@@ -177,73 +234,100 @@ export class ProfilePage extends ProfileLocators {
   /**
    * Verifies Address Book page URL.
    */
+  @step('Verify Address Book page is displayed')
   async verifyAddressBookPage(): Promise<void> {
-    await expect(this.page).toHaveURL(Constants.ADDRESS_BOOK_URL);
+    await AssertHelper.expectUrl(this.page, /route=account\/address/, 'Address Book');
+    await AssertHelper.expectVisible(this.btnNewAddress, 'New Address button');
   }
 
   /**
    * Verifies user lands on account success or My Account right after registration.
    */
+  @step('Verify registration result page is displayed')
   async verifyRegistrationResultPage(): Promise<void> {
-    await expect(this.page).toHaveURL(/route=account\/success|route=account\/account/);
+    await AssertHelper.expectUrl(
+      this.page,
+      /route=account\/success|route=account\/account/,
+      'Registration result',
+    );
   }
 
   /**
    * Clicks Continue when user is on account success page.
    */
+  @step('Continue from registration success page')
   async continueFromRegistrationSuccessIfNeeded(): Promise<void> {
     if (this.page.url().includes('route=account/success')) {
-      await this.btnContinue.first().click();
+      await this.commonPage.click(this.btnContinue);
     }
   }
 
   /**
    * Verifies add address success message.
    */
+  @step('Verify add address success message')
   async expectAddAddressSuccessMessage(): Promise<void> {
-    await expect(this.alertSuccessUpdate).toBeVisible();
-    await expect(this.alertSuccessUpdate).toContainText(
+    await AssertHelper.expectVisible(this.alertSuccessUpdate, 'add address success alert');
+    await AssertHelper.expectContainsText(
+      this.alertSuccessUpdate,
       Messages.ADD_ADDRESS_SUCCESS_MESSAGE,
+      'add address success alert',
     );
   }
 
   /**
    * Verifies an added address is listed in Address Book.
    */
-  async expectAddressPresent(data: AddressData): Promise<void> {
-    await expect(this.page.getByText(data.address1, { exact: false })).toBeVisible();
-    await expect(this.page.getByText(data.city, { exact: false })).toBeVisible();
+  @step('Verify address is present in Address Book')
+  async expectAddressPresent(data: Address): Promise<void> {
+    await AssertHelper.expectVisible(
+      this.page.getByText(data.address1, { exact: false }),
+      `address line containing ${data.address1}`,
+    );
+    await AssertHelper.expectVisible(
+      this.page.getByText(data.city, { exact: false }),
+      `city containing ${data.city}`,
+    );
   }
 
   /**
    * Verifies account shortcuts and side links required by TC001.
    */
-  async expectMainAccountShortcuts(): Promise<void> {
-    await expect(
+  @step('Verify account shortcuts are visible')
+  async expectEditAccountShortcuts(): Promise<void> {
+    await AssertHelper.expectVisible(
       this.page.getByRole('link', { name: /Edit your account information/i }),
-    ).toBeVisible();
-
-    await expect(
+      'Edit account shortcut',
+    );
+  }
+  @step('Verify change password shortcuts are visible')
+  async expectChangePasswordShortcuts(): Promise<void> {
+    await AssertHelper.expectVisible(
       this.page.getByRole('link', { name: /Change your password/i }),
-    ).toBeVisible();
-
-    await expect(
+      'Change password shortcut',
+    );
+  }
+  @step('Verify modify address shortcuts are visible')
+  async expectModifyAddressShortcuts(): Promise<void> {
+    await AssertHelper.expectVisible(
       this.page.getByRole('link', {
         name: /Modify your address book entries/i,
       }),
-    ).toBeVisible();
+      'Modify address shortcut',
+    );
 
-    await expect(this.accountRightColumn).toBeVisible();
+    await AssertHelper.expectVisible(this.accountRightColumn, 'right column');
   }
 
   /**
    * Verifies Edit Account form fields are visible.
    */
+  @step('Verify Edit Account form fields are visible')
   async expectEditAccountUpdate(): Promise<void> {
-    await expect(this.inputFirstName).toBeVisible();
-    await expect(this.inputLastName).toBeVisible();
-    await expect(this.inputTelephone).toBeVisible();
-    await expect(this.inputUpdateEmail).toBeVisible();
+    await AssertHelper.expectVisible(this.inputFirstName, 'First Name input');
+    await AssertHelper.expectVisible(this.inputLastName, 'Last Name input');
+    await AssertHelper.expectVisible(this.inputTelephone, 'Telephone input');
+    await AssertHelper.expectVisible(this.inputUpdateEmail, 'Email input');
   }
 
   /**
@@ -257,31 +341,34 @@ export class ProfilePage extends ProfileLocators {
    * Verifies Logout confirmation page URL and message.
    */
   async verifyLogoutPage(): Promise<void> {
-    await expect(this.page).toHaveURL(Constants.LOGOUT_URL);
+    await AssertHelper.expectUrl(this.page, /route=account\/logout/, 'Logout');
     await this.expectLogoutSuccessMessage();
+    await AssertHelper.expectVisible(this.btnLogoutContinue, 'Logout continue button');
   }
 
   /**
    * Verifies logout success confirmation message.
    */
   async expectLogoutSuccessMessage(): Promise<void> {
-    await expect(
+    await AssertHelper.expectVisible(
       this.page.getByText(Messages.LOGOUT_CONFIRM_MESSAGE, { exact: false }),
-    ).toBeVisible();
+      'Logout confirmation message',
+    );
   }
 
   /**
    * Clicks Continue button after logout.
    */
   async continueAfterLogout(): Promise<void> {
-    await expect(this.btnLogoutContinue).toBeVisible();
-    await this.btnLogoutContinue.click();
+    await AssertHelper.expectVisible(this.btnLogoutContinue, 'Logout continue button');
+    await this.commonPage.click(this.btnLogoutContinue);
   }
 
   /**
    * Verifies user is redirected after logout.
    */
+  @step('Verify user is redirected after logout')
   async verifyLogoutRedirectPage(): Promise<void> {
-    await expect(this.page).toHaveURL(Constants.LOGOUT_REDIRECT_URL);
+    await AssertHelper.expectUrl(this.page, /route=common\/home/, 'Logout redirect');
   }
 }

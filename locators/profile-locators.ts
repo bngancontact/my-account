@@ -1,6 +1,6 @@
 import { Locator, Page } from '@playwright/test';
 import { CommonLocators } from './common-locators';
-import { DefaultAddressOption } from '../models/user';
+import { DefaultAddressOption } from '../models/address';
 
 export class ProfileLocators extends CommonLocators {
   inputFirstName!: Locator;
@@ -75,12 +75,13 @@ export class ProfileLocators extends CommonLocators {
     this.btnLogoutContinue = this.page.locator("//a[contains(text(), 'Continue')]");
     this.btnContinue = this.page.locator("//a[contains(text(), 'Continue')]");
   }
-// Dynamic locator for country dropdown option based on country name
-  countryDropdown(countryName: string): Locator {
+// Dynamic locator for country option by visible label
+  countryOptionByName(countryName: string): Locator {
     return this.page.locator(`#input-country option:text-is("${countryName}")`);
   }
-// Dynamic locator for region dropdown option based on region name
-  regionDropdown(regionName: string): Locator {
+
+// Dynamic locator for region option by visible label
+  regionOptionByName(regionName: string): Locator {
     return this.page.locator(`#input-zone option:text-is("${regionName}")`);
   }
 

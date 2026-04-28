@@ -1,11 +1,9 @@
 import { faker } from '@faker-js/faker';
 import {
-  AddressData,
-  DefaultAddressOption,
-  RegisterData,
-  UpdateProfileData,
+  UserProfile,
   User,
 } from '../models/user';
+import { Address, DefaultAddressOption, } from '../models/address';
 import { Constants } from '../utilities/constants';
 import { ENV } from '../models';
 import { readJsonFile } from '../utilities/jsonHandling';
@@ -21,11 +19,11 @@ const DEFAULT_ADDRESS_OPTIONS: DefaultAddressOption[] = ['yes', 'no'];
 /**
  * Creates random but valid profile data for account update test.
  */
-export function createUpdateProfileData(): UpdateProfileData {
+export function createUpdateProfileData(): Pick<UserProfile, 'firstName' | 'lastName' | 'phone'> {
   return {
     firstName: faker.person.firstName(),
     lastName: faker.person.lastName(),
-    telephone: faker.string.numeric(10),
+    phone: faker.string.numeric(10),
   };
 }
 /**
@@ -48,7 +46,7 @@ export function getRandomRegionByCountry(country: string): string {
  * Creates random address data.
  * Country and region are generated as one valid pair.
  */
-export function createAddressData(): AddressData {
+export function createAddressData(): Address {
   const country = getRandomCountry();
   const region = getRandomRegionByCountry(country);
 
@@ -59,7 +57,7 @@ export function createAddressData(): AddressData {
     address1: faker.location.streetAddress(),
     address2: faker.location.secondaryAddress(),
     city: faker.location.city(),
-    postcode: faker.string.numeric(5),
+    postCode: faker.string.numeric(5),
     country,
     region,
     defaultAddress: faker.helpers.arrayElement(DEFAULT_ADDRESS_OPTIONS),
@@ -69,7 +67,7 @@ export function createAddressData(): AddressData {
 /**
  * Creates a unique account for register/login flows.
  */
-export function createRegisterData(): RegisterData {
+export function createRegisterData(): UserProfile {
   const uniqueId = faker.string.alphanumeric(10).toLowerCase();
   const password = createStrongPassword();
 
@@ -77,7 +75,7 @@ export function createRegisterData(): RegisterData {
     firstName: faker.person.firstName(),
     lastName: faker.person.lastName(),
     email: `qa.auto.${uniqueId}@example.com`,
-    telephone: faker.string.numeric(10),
+    phone: faker.string.numeric(10),
     password,
   };
 }

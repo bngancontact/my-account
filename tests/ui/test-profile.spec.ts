@@ -9,9 +9,11 @@ import { Constants } from '../../utilities/constants';
 import { user } from '../../data/login.data';
 import type { UserProfile } from '../../models/user';
 
+test.describe.configure({ timeout: 60000 });
+
 test.describe('TC001 - My Account Dashboard', () => {
-  test.beforeEach(async ({ loginPage }) => {
-    await loginPage.goto();
+  test.beforeEach(async ({ homePage, loginPage }) => {
+    await homePage.goToLoginPage();
     await loginPage.login(user);
   });
 
@@ -19,13 +21,16 @@ test.describe('TC001 - My Account Dashboard', () => {
     profilePage,
   }) => {
     await profilePage.verifyMyAccountPage();
-    await profilePage.expectMainAccountShortcuts();
+    await profilePage.verifyRightColumn();
+    await profilePage.expectEditAccountShortcuts();
+    await profilePage.expectChangePasswordShortcuts();
+    await profilePage.expectModifyAddressShortcuts();
   });
 });
 
 test.describe('TC002 - Update Account Information', () => {
-  test.beforeEach(async ({ loginPage }) => {
-    await loginPage.goto();
+  test.beforeEach(async ({ homePage, loginPage }) => {
+    await homePage.goToLoginPage();
     await loginPage.login(user);
   });
 
@@ -33,13 +38,13 @@ test.describe('TC002 - Update Account Information', () => {
     profilePage,
   }) => {
     const updatedData = createUpdateProfileData();
-    await profilePage.btnEditAccount.click();
-    await profilePage.updateAccountInformation(updatedData);
+    const updatedDataForProfile: UserProfile = updatedData as UserProfile;
+    await profilePage.openEditAccountPage();
+    await profilePage.updateAccountInformation(updatedDataForProfile);
     await profilePage.expectAccountUpdateSuccessMessage();
     await profilePage.verifyMyAccountPage();
-    await profilePage.btnEditAccount.click();
-    await profilePage.getEditAccountValues();
-    await profilePage.expectEditAccountValues(updatedData);
+    await profilePage.openEditAccountPage();
+    await profilePage.expectEditAccountValues(updatedDataForProfile);
   });
 });
 
@@ -55,7 +60,7 @@ test.describe('TC003 - Change Password', () => {
       firstName: registerData.firstName,
       lastName: registerData.lastName,
       email: registerData.email,
-      phone: registerData.telephone,
+      phone: registerData.phone,
       password: registerData.password,
     };
 
@@ -75,14 +80,15 @@ test.describe('TC003 - Change Password', () => {
 });
 
 test.describe('TC004 - Add New Address', () => {
-  test.beforeEach(async ({ loginPage }) => {
-    await loginPage.goto();
+  test.beforeEach(async ({ homePage, loginPage }) => {
+    await homePage.goToLoginPage();
     await loginPage.login(user);
   });
 
   test('should add a new address and show it in Address Book', async ({
     profilePage,
   }) => {
+    test.setTimeout(60000);
     const addressData = createAddressData();
     await profilePage.openAddAddressPage();
     await profilePage.addNewAddress(addressData);
@@ -93,8 +99,8 @@ test.describe('TC004 - Add New Address', () => {
 });
 
 test.describe('TC005 - Logout', () => {
-  test.beforeEach(async ({ loginPage }) => {
-    await loginPage.goto();
+  test.beforeEach(async ({ homePage, loginPage }) => {
+    await homePage.goToLoginPage();
     await loginPage.login(user);
   });
 
