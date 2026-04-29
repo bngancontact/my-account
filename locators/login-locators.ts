@@ -8,16 +8,15 @@ export class LoginLocators extends CommonLocators {
     this.locatorInitialization();
   }
   
-  inputUsername!: Locator;
+  inputEmail!: Locator;
   inputPassword!: Locator;
-  btnLogin!: Locator;
   flashMessage!: Locator;
 
   locatorInitialization(): void {
     super.locatorInitialization();
-    this.inputUsername = this.page.locator('#input-email, #username').first();
-    this.inputPassword = this.page.locator('#input-password, #password').first();
-    this.btnLogin = this.page.locator("input[value='Login'], button:has-text('Login')").first();
-    this.flashMessage = this.page.locator('#flash, .alert-danger, .alert-success').first();
+    this.inputEmail = this.page.locator('#input-email, #username');
+    this.inputPassword = this.page.locator('#input-password, #password');
+    this.btnSubmit = this.page.locator("//input[@type='submit']");
+    this.flashMessage = this.page.locator('#flash, .alert-danger, .alert-success');
   }
 }

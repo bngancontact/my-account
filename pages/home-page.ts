@@ -41,7 +41,6 @@ export class HomePage extends HomeLocators {
    */
   @step('Navigate to Login page from Home page')
   async goToLoginPage(): Promise<void> {
-    await this.goto();
     await this.openMyAccountDropdown();
     await this.commonPage.click(this.lnkMyAccountLogin);
     await this.page.waitForURL(/route=account\/login/);
