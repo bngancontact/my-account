@@ -26,17 +26,27 @@ export class ProfilePage extends ProfileLocators {
   @step('Verify My Account page is displayed')
   async verifyMyAccountPage(): Promise<void> {
     await this.page.waitForURL(/route=account\/account/);
-    Assertions.assertTextMatch(this.page.url(), /route=account\/account/, 'My Account');
-    await this.assertHelper.assertElementVisible(this.hdrAccount, 'My Account heading');
+    Assertions.assertTextMatch(this.page.url(),
+      /route=account\/account/,
+      'My Account');
+    await this.assertHelper.assertElementVisible(
+      this.hdrAccount,
+      'My Account heading');
   }
+  /**
+   * Verifies right column is visible in My Account page.
+   */
   @step('Verify right column is visible')
   async verifyRightColumn(): Promise<void> {
-    await this.assertHelper.assertElementVisible(this.accountRightColumn, 'right column');
+    await this.assertHelper.assertElementVisible(
+      this.accountRightColumn,
+      'Right column'
+    );
   }
   /**
    * Updates the user's profile information with the provided data.
    * @param profileData - An object containing the user's profile information to be updated.
-  */
+   */
   @step('Update profile information')
   async updateProfileInformation(profileData: UserProfile): Promise<void> {
     await this.commonPage.fill(this.inputFirstName, profileData.firstName);
@@ -55,27 +65,28 @@ export class ProfilePage extends ProfileLocators {
     await this.assertHelper.assertElementHasValue(
       this.inputFirstName,
       expectedProfileData.firstName,
-      'firstName',
+      'First Name',
     );
     await this.assertHelper.assertElementHasValue(
       this.inputLastName,
       expectedProfileData.lastName,
-      'lastName',
+      'Last Name',
     );
     await this.assertHelper.assertElementHasValue(
       this.inputUpdateEmail,
       expectedProfileData.email,
-      'email',
+      'Email',
     );
     await this.assertHelper.assertElementHasValue(
       this.inputTelephone,
       expectedProfileData.phone,
-      'phone',
+      'Phone',
     );
   }
 
   /**
    * Updates the user's configuration settings with the provided data.
+   * @param settingsData - An object containing the configuration settings to be updated.
    */
   @step('Update Configuration Settings')
   async updateConfigurationSettings(settingsData: unknown): Promise<void> {
@@ -104,15 +115,13 @@ export class ProfilePage extends ProfileLocators {
 
   /**
    * Verifies account update success message.
-   * @param expectedMessage - The expected success message to be verified.
    */
   @step('Verify account update success message')
   async expectAccountUpdateSuccessMessage(): Promise<void> {
-    await this.assertHelper.assertElementVisible(this.alertSuccessUpdate, 'account update success alert');
     await this.assertHelper.assertElementContainsText(
       this.alertSuccessUpdate,
       Messages.ACCOUNT_UPDATE_SUCCESS_MESSAGE,
-      'account update success alert',
+      'Account update success alert',
     );
   }
 
@@ -130,6 +139,7 @@ export class ProfilePage extends ProfileLocators {
 
   /**
    * Verifies Edit Account form values against expected data.
+   * @param expectedData - The expected data to compare against.
    */
   @step('Verify Edit Account form values')
   async expectEditAccountValues(expectedData: UserProfile): Promise<void> {
@@ -162,6 +172,7 @@ export class ProfilePage extends ProfileLocators {
 
   /**
    * Changes account password.
+   * @param newPassword - The new password to set.
    */
   @step('Change account password')
   async changePassword(newPassword: string): Promise<void> {
@@ -175,11 +186,10 @@ export class ProfilePage extends ProfileLocators {
    */
   @step('Verify change password success message')
   async expectChangePasswordSuccessMessage(): Promise<void> {
-    await this.assertHelper.assertElementVisible(this.alertSuccessUpdate, 'change password success alert');
     await this.assertHelper.assertElementContainsText(
       this.alertSuccessUpdate,
       Messages.CHANGE_PASSWORD_SUCCESS_MESSAGE,
-      'change password success alert',
+      'Change password success alert',
     );
   }
 
@@ -193,10 +203,8 @@ export class ProfilePage extends ProfileLocators {
   }
 
   /**
-   * Adds a new address with provided data.
-   *
-   * Country and region are generated in user.helper.ts.
-   * This page object only uses the provided data and does not generate random data.
+   * Adds a new address with the provided data.
+   * @param data - An object containing the address information to be added.
    */
   @step('Add new address to Address Book')
   async addNewAddress(data: Address): Promise<void> {
@@ -216,6 +224,9 @@ export class ProfilePage extends ProfileLocators {
 
   /**
    * Selects country first, waits for the expected region option, then selects region.
+   * @param country - The country to be selected.
+   * @param region - The region to be selected.
+   * Note: This method includes assertions to ensure the expected country and region options are present before attempting to select them, improving test reliability.
    */
   @step('Select country and region in Address form')
   async selectCountryAndRegion(country: string, region: string): Promise<void> {
@@ -241,8 +252,13 @@ export class ProfilePage extends ProfileLocators {
   @step('Verify Address Book page is displayed')
   async verifyAddressBookPage(): Promise<void> {
     await this.page.waitForURL(/route=account\/address/);
-    Assertions.assertTextMatch(this.page.url(), /route=account\/address/, 'Address Book');
-    await this.assertHelper.assertElementVisible(this.btnNewAddress, 'New Address button');
+    Assertions.assertTextMatch(this.page.url(),
+      /route=account\/address/,
+      'Address Book');
+    await this.assertHelper.assertElementVisible(
+      this.btnNewAddress,
+      'New Address button'
+    );
   }
 
   /**
@@ -273,27 +289,27 @@ export class ProfilePage extends ProfileLocators {
    */
   @step('Verify add address success message')
   async expectAddAddressSuccessMessage(): Promise<void> {
-    await this.assertHelper.assertElementVisible(this.alertSuccessUpdate, 'add address success alert');
     await this.assertHelper.assertElementContainsText(
       this.alertSuccessUpdate,
       Messages.ADD_ADDRESS_SUCCESS_MESSAGE,
-      'add address success alert',
+      'Add address success alert',
     );
   }
 
   /**
    * Verifies an added address is listed in Address Book.
+   * @param data - The address data to be verified in the Address Book list.
    */
   @step('Verify address is present in Address Book')
   async expectAddressPresent(data: Address): Promise<void> {
     await this.assertHelper.assertElementVisible(
       this.text(data.address1, false),
-      `address line containing ${data.address1}`,
+      `Address line containing ${data.address1}`,
     );
 
     await this.assertHelper.assertElementVisible(
       this.text(data.city, false),
-      `city containing ${data.city}`,
+      `City containing ${data.city}`,
     );
   }
 
@@ -307,6 +323,9 @@ export class ProfilePage extends ProfileLocators {
       'Edit account shortcut',
     );
   }
+  /**
+   * Verifies change password shortcuts are visible.
+   */
   @step('Verify change password shortcuts are visible')
   async expectChangePasswordShortcuts(): Promise<void> {
     await this.assertHelper.assertElementVisible(
@@ -314,6 +333,9 @@ export class ProfilePage extends ProfileLocators {
       'Change password shortcut',
     );
   }
+  /**
+   * Verifies modify address shortcuts are visible.
+   */
   @step('Verify modify address shortcuts are visible')
   async expectModifyAddressShortcuts(): Promise<void> {
     await this.assertHelper.assertElementVisible(
@@ -321,7 +343,10 @@ export class ProfilePage extends ProfileLocators {
       'Modify address shortcut',
     );
 
-    await this.assertHelper.assertElementVisible(this.accountRightColumn, 'right column');
+    await this.assertHelper.assertElementVisible(
+      this.accountRightColumn,
+      'Right column'
+    );
   }
 
   /**
@@ -329,10 +354,22 @@ export class ProfilePage extends ProfileLocators {
    */
   @step('Verify Edit Account form fields are visible')
   async expectEditAccountUpdate(): Promise<void> {
-    await this.assertHelper.assertElementVisible(this.inputFirstName, 'First Name input');
-    await this.assertHelper.assertElementVisible(this.inputLastName, 'Last Name input');
-    await this.assertHelper.assertElementVisible(this.inputTelephone, 'Telephone input');
-    await this.assertHelper.assertElementVisible(this.inputUpdateEmail, 'Email input');
+    await this.assertHelper.assertElementVisible(
+      this.inputFirstName,
+      'First Name input'
+    );
+    await this.assertHelper.assertElementVisible(
+      this.inputLastName,
+      'Last Name input'
+    );
+    await this.assertHelper.assertElementVisible(
+      this.inputTelephone,
+      'Telephone input'
+    );
+    await this.assertHelper.assertElementVisible(
+      this.inputUpdateEmail,
+      'Email input'
+    );
   }
 
   /**
@@ -340,8 +377,8 @@ export class ProfilePage extends ProfileLocators {
    */
   @step('Click Logout button')
   async logout(): Promise<void> {
-  await this.commonPage.click(this.btnLogout);
-}
+    await this.commonPage.click(this.btnLogout);
+  }
 
   /**
    * Verifies Logout confirmation page URL and message.
@@ -349,9 +386,13 @@ export class ProfilePage extends ProfileLocators {
   @step('Verify Logout confirmation page')
   async verifyLogoutPage(): Promise<void> {
     await this.page.waitForURL(/route=account\/logout/);
-    Assertions.assertTextMatch(this.page.url(), /route=account\/logout/, 'Logout');
+    Assertions.assertTextMatch(this.page.url(),
+      /route=account\/logout/,
+      'Logout');
     await this.expectLogoutSuccessMessage();
-    await this.assertHelper.assertElementVisible(this.btnLogoutContinue, 'Logout continue button');
+    await this.assertHelper.assertElementVisible(
+      this.btnLogoutContinue,
+      'Logout continue button');
   }
 
   /**
@@ -370,7 +411,6 @@ export class ProfilePage extends ProfileLocators {
    */
   @step('Click Continue button after logout')
   async continueAfterLogout(): Promise<void> {
-    await this.assertHelper.assertElementVisible(this.btnLogoutContinue, 'Logout continue button');
     await this.commonPage.click(this.btnLogoutContinue);
   }
 
@@ -380,6 +420,8 @@ export class ProfilePage extends ProfileLocators {
   @step('Verify user is redirected after logout')
   async verifyLogoutRedirectPage(): Promise<void> {
     await this.page.waitForURL(/route=common\/home/);
-    Assertions.assertTextMatch(this.page.url(), /route=common\/home/, 'Logout redirect');
+    Assertions.assertTextMatch(this.page.url(),
+      /route=common\/home/,
+      'Logout redirect');
   }
 }

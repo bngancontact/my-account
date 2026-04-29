@@ -22,22 +22,31 @@ export class HomePage extends HomeLocators {
   async selectMenu(menuName: string): Promise<void> {
   }
 
+  /**
+   * Navigates to the Home page.
+   */
   @step('Open Home page')
   async goto(): Promise<void> {
     await this.commonPage.goto(Constants.BASE_URL);
   }
-
+  /**
+   * Opens the My Account dropdown menu.
+   */
   @step('Open My Account dropdown')
   async openMyAccountDropdown(): Promise<void> {
     await this.commonPage.click(this.ddlMyAccount);
   }
-
+  /**
+   * Navigates to the Login page from the Home page.
+   */
   @step('Navigate to Login page from Home page')
   async goToLoginPage(): Promise<void> {
     await this.goto();
     await this.openMyAccountDropdown();
     await this.commonPage.click(this.lnkMyAccountLogin);
     await this.page.waitForURL(/route=account\/login/);
-    Assertions.assertTextMatch(this.page.url(), /route=account\/login/, 'Login page');
+    Assertions.assertTextMatch(this.page.url(),
+      /route=account\/login/,
+      'Login page');
   }
 }
