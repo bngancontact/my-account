@@ -3,7 +3,7 @@ import { Constants } from '../utilities/constants';
 import { CommonPage } from './common-page';
 import { step } from '../utilities/logging';
 import { HomeLocators } from '../locators/home-locators';
-import { AssertHelper } from '../utilities/assert-helper';
+import { Assertions } from '../utilities/assertions';
 
 export class HomePage extends HomeLocators {
 
@@ -29,14 +29,15 @@ export class HomePage extends HomeLocators {
 
   @step('Open My Account dropdown')
   async openMyAccountDropdown(): Promise<void> {
-    await this.commonPage.click(this.myAccountDropdown);
+    await this.commonPage.click(this.ddlMyAccount);
   }
 
   @step('Navigate to Login page from Home page')
   async goToLoginPage(): Promise<void> {
     await this.goto();
     await this.openMyAccountDropdown();
-    await this.commonPage.click(this.myAccountLoginLink);
-    await AssertHelper.expectUrl(this.page, /route=account\/login/, 'Login page');
+    await this.commonPage.click(this.lnkMyAccountLogin);
+    await this.page.waitForURL(/route=account\/login/);
+    Assertions.assertTextMatch(this.page.url(), /route=account\/login/, 'Login page');
   }
 }

@@ -1,18 +1,20 @@
-import { expect, Page } from '@playwright/test';
+import { Page } from '@playwright/test';
 import { User } from '../models/user';
 import { Constants } from '../utilities/constants';
 import { Messages } from '../data/messages.data';
 import { LoginLocators } from '../locators/login-locators';
 import { step } from '../utilities/logging';
 import { CommonPage } from './common-page';
+import { AssertHelper } from './assert-helper-page';
 
 export class LoginPage extends LoginLocators {
 
   commonPage: CommonPage;
-
+  assertHelper: AssertHelper;
   constructor(page: Page) {
     super(page);
     this.commonPage = new CommonPage(page);
+    this.assertHelper = new AssertHelper();
   }
   /**
    * Navigates to the login page URL directly.
@@ -22,7 +24,6 @@ export class LoginPage extends LoginLocators {
   @step('Navigating to Login page')
   async goto(url: string = Constants.LOGIN_URL): Promise<void> {
     await this.commonPage.goto(url);
-    await expect(this.inputUsername).toBeVisible();
   }
 
   /**
@@ -35,11 +36,16 @@ export class LoginPage extends LoginLocators {
     await this.commonPage.fill(this.inputPassword, user.password);
     await this.commonPage.click(this.btnLogin);
   }
-  
+
   /**
    * Asserts that login success banner is visible.
    */
+  @step('Assert successful login')
   async expectSuccessfulLogin(): Promise<void> {
-    await expect(this.flashMessage).toContainText(Messages.SUCCESS_MESSAGE);
+    await this.assertHelper.assertElementContainsText(
+      this.flashMessage,
+      Messages.SUCCESS_MESSAGE,
+      'Login success banner',
+    );
   }
 }

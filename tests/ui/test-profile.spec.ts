@@ -88,7 +88,6 @@ test.describe('TC004 - Add New Address', () => {
   test('should add a new address and show it in Address Book', async ({
     profilePage,
   }) => {
-    test.setTimeout(60000);
     const addressData = createAddressData();
     await profilePage.openAddAddressPage();
     await profilePage.addNewAddress(addressData);
