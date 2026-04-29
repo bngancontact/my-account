@@ -26,15 +26,12 @@ export class HomeLocators extends CommonLocators {
 
     locatorInitialization() {
         super.locatorInitialization();
-
         this.shopByCategoryMenu = this.page.locator(
             '//a[text()=" Shop by Category"]',
         );
-
         this.itemTopCategory = (itemName: string): Locator => {
             return this.page.locator(`//span[contains(text(),"${itemName}")]`);
         };
-
         this.productLink = (productName: string) =>
             this.page
                 .locator(`h4 a[href*="route=product/product"]`, {
@@ -60,22 +57,12 @@ export class HomeLocators extends CommonLocators {
 
         this.menuLink = (menuName: string) =>
             this.page.locator('nav').locator(`a:has-text("${menuName}")`);
-
         this.btnMyAccount = this.page
             .getByRole('button', { name: /My account/i })
             .first();
-
         this.lnkRegister = this.page
             .getByRole('link', { name: 'Register' })
             .first();
-
-        this.ddlMyAccount = this.page.locator(
-            "a[href*='route=account/account'].dropdown-toggle",
-        );
-
-        this.lnkMyAccountLogin = this.page.locator(
-            "a[href*='route=account/login']:visible",
-        );
     }
 
     getProductCard(productName: string): Locator {
