@@ -10,7 +10,7 @@ import { readJsonFile } from '../utilities/jsonHandling';
 
 const COUNTRY_REGIONS: Record<string, string[]> = {
   'United States': ['California', 'Florida', 'Texas', 'New York'],
-  'Canada': ['Ontario', 'Quebec', 'Alberta', 'British Columbia'],
+  'Canada': ['Ontario', 'Québec', 'Alberta', 'British Columbia'],
   'Australia': ['New South Wales', 'Victoria', 'Queensland'],
 };
 
