@@ -425,3 +425,4 @@ export class ProfilePage extends ProfileLocators {
       'Logout redirect');
   }
 }
+

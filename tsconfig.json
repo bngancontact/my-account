@@ -1,15 +1,22 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
-    "module": "commonjs",
+    "target": "ESNext",
+    "module": "CommonJS",
     "moduleResolution": "node",
-    "lib": ["ES2022", "DOM", "ESNext.Disposable"],
+    "baseUrl": ".",
+    "paths": {
+      "@pages/*": ["pages/*"],
+      "@utilities/*": ["utilities/*"],
+      "@locators/*": ["locators/*"],
+      "@models/*": ["models/*"],
+      "@data/*": ["data/*"],
+      "@tests/*": ["tests/*"]
+    },
     "types": ["node", "@playwright/test"],
     "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "ignoreDeprecations": "6.0",
-    "skipLibCheck": true,
-    "noEmit": true
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true
   },
   "include": ["**/*.ts"],
   "exclude": ["node_modules"]

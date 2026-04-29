@@ -10,6 +10,28 @@ export class CommonPage extends CommonLocators {
         super(page);
     }
 
+     /**
+     * Go to the URL
+     * @param url
+     */
+    @step('Go to the URL')
+    async goto(url: string, isWait: boolean = true): Promise<void> {
+        await this.page.goto(url);
+        await this.page.waitForLoadState();
+        if (isWait) {
+            await Utility.delay(3);
+        }
+    }
+
+    /**
+     * Clicks the "Continue" button.
+     */
+    @step('Click on Continue button')
+    async clickContinue(): Promise<void> {
+        await this.click(this.btnContinue);
+        await this.waitForPageLoad();
+    }
+
     /**
      * Click on Locator
      * @param locator
@@ -347,19 +369,6 @@ export class CommonPage extends CommonLocators {
      */
     async closeBrowser(): Promise<void> {
         await this.page.close();
-    }
-
-    /**
-     * Go to the URL
-     * @param url
-     */
-    @step('Go to the URL')
-    async goto(url: string, isWait: boolean = true): Promise<void> {
-        await this.page.goto(url);
-        await this.page.waitForLoadState();
-        if (isWait) {
-            await Utility.delay(3);
-        }
     }
 
     /**
@@ -772,5 +781,26 @@ export class CommonPage extends CommonLocators {
         } catch {
             return null;
         }
+    }
+
+    /**
+         * Verify page loaded by checking title or load state
+         * @param expectedTitle - Expected title of the page (can be string or regex)
+         */
+    @step('Verify page loaded')
+    async verifyPageLoaded(expectedTitle?: string | RegExp): Promise<void> {
+        if (expectedTitle) {
+            // Wait for title match
+            await expect(this.page).toHaveTitle(expectedTitle);
+        } else {
+            // Wait for DOM to load
+            await this.page.waitForLoadState('domcontentloaded');
+        }
+     * Get Current URL
+     * @returns
+     */
+    @step('Get Current URL')
+    getCurrentUrl(): string {
+        return this.page.url();
     }
 }
